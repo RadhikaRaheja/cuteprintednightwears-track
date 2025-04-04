@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Track Your Order</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Background Video -->
   <video autoplay loop muted id="bgVideo">
     <source src="https://cdn.pixabay.com/video/2023/01/26/148100-793525275_large.mp4" type="video/mp4">
   </video>
 
+  <!-- Main Content -->
   <div class="main-wrapper">
     <img src="https://github.com/Himanshu-Mittal001/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" class="logo">
     <h2>📦 Track Your Order</h2>
 
+    <!-- Search Section -->
     <div class="search-bar">
       <label for="searchField">🔍 Search by:</label>
       <select id="searchField" onchange="handleSearchFieldChange()">
@@ -29,8 +35,10 @@
       <button class="search-btn" onclick="filterResults()">Search</button>
     </div>
 
+    <!-- Loading -->
     <div class="loading">⏳ Loading...</div>
 
+    <!-- Results Table -->
     <table>
       <thead>
         <tr>
@@ -44,12 +52,14 @@
       <tbody id="resultsTable"></tbody>
     </table>
 
+    <!-- Pagination -->
     <div class="pagination">
       <button onclick="prevPage()">⬅️</button>
-      <span>Page <input type="number" id="pageNumber" min="1" onchange="jumpToPage()" /> of <span id="totalPages"></span></span>
+      <span>Page <input type="number" id="pageNumber" min="1" onchange="jumpToPage()"> of <span id="totalPages"></span></span>
       <button onclick="nextPage()">➡️</button>
     </div>
 
+    <!-- Popup -->
     <div class="popup-overlay" id="popupOverlay">
       <div class="popup">
         <button class="close-btn" onclick="hidePopup()">Close</button>
