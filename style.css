@@ -1,0 +1,55 @@
+body {
+  font-family: 'Outfit', sans-serif;
+  margin: 30px;
+  color: #333;
+  background: rgba(255,255,255,0.85);
+}
+
+.main-wrapper {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.logo {
+  width: 160px;
+  border-radius: 20px;
+  display: block;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+input, select, button {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-btn {
+  background: #ff69b4;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.search-btn:hover {
+  background: #e60073;
+}
