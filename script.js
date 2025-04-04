@@ -1,58 +1,49 @@
-let data = [], filteredData = [], couriers = {}, currentPage = 1, entriesPerPage = 10;
+let data = [], filteredData = [], currentPage = 1, entriesPerPage = 10;
 
-async function fetchData() {
-  document.querySelector('.loading').style.display = 'block';
-  const response = await fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record');
-  data = await response.json();
-  filteredData = data;
-  document.querySelector('.loading').style.display = 'none';
-  renderResults();
+function handleSearchFieldChange() {
+  const field = document.getElementById('searchField').value;
+  document.getElementById('searchInput').style.display = field === 'Date' ? 'none' : 'inline-block';
+  document.getElementById('dateInput').style.display = field === 'Date' ? 'inline-block' : 'none';
 }
 
-function formatDate(inputDate) {
-  const date = new Date(inputDate);
-  if (isNaN(date)) return '';
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
-}
-
-function filterResults() {
-  let field = document.getElementById('searchField').value;
-  let query = document.getElementById('searchInput').value.toLowerCase();
-  if (field === 'Date') query = formatDate(document.getElementById('dateInput').value);
-
-  filteredData = data.filter(row => {
-    if (!row[field]) return false;
-    let value = field === 'Date' ? formatDate(row[field]) : row[field].toLowerCase();
-    return value.includes(query);
-  });
-
-  currentPage = 1;
-  renderResults();
+function fetchData() {
+  fetch('https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record')
+    .then(response => response.json())
+    .then(result => {
+      data = result.filter(row => row["Date"]);
+      filteredData = data;
+      renderResults();
+    });
 }
 
 function renderResults() {
   const table = document.getElementById('resultsTable');
-  table.innerHTML = '';
+  table.innerHTML = "";
   paginate(filteredData, currentPage).forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${formatDate(row.Date)}</td>
+      <td>${row["Date"] || '-'}</td>
       <td>${row["Customer Name"]}</td>
       <td>${row["Location (Pincode)"]}</td>
-      <td>${row["Courier Name"]}</td>
-      <td>${row["Tracking ID"]}</td>
+      <td>${row["Courier Name"] || '-'}</td>
+      <td>${row["Tracking ID"] || '-'}</td>
     `;
+    tr.onclick = () => showPopup(row);
     table.appendChild(tr);
   });
-
-  document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / entriesPerPage);
 }
 
-function paginate(data, page) {
-  return data.slice((page - 1) * entriesPerPage, page * entriesPerPage);
+function showPopup(row) {
+  document.getElementById('popupContent').innerHTML = `
+    <p><b>Name:</b> ${row["Customer Name"]}</p>
+    <p><b>Pincode:</b> ${row["Location (Pincode)"]}</p>
+    <p><b>Tracking ID:</b> ${row["Tracking ID"] || '-'}</p>
+  `;
+  document.getElementById('popupOverlay').style.display = 'flex';
 }
 
-function prevPage() { if (currentPage > 1) currentPage--; renderResults(); }
-function nextPage() { if (currentPage < Math.ceil(filteredData.length / entriesPerPage)) currentPage++; renderResults(); }
+function hidePopup() {
+  document.getElementById('popupOverlay').style.display = 'none';
+}
 
 fetchData();
