@@ -1,73 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Your Order</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Tracking</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="theme-toggle">
+    <button id="toggleTheme">🌞 / 🌙</button>
+  </div>
+  <div class="container">
+    <h1>📦 Order Tracking Dashboard</h1>
+    <input type="text" id="searchBox" placeholder="Search by any field..." />
+    <div id="tableWrapper"></div>
+  </div>
 
-  <!-- Background Video -->
-  <video autoplay loop muted id="bgVideo">
-    <source src="https://cdn.pixabay.com/video/2023/01/26/148100-793525275_large.mp4" type="video/mp4">
-  </video>
-
-  <!-- Main Content -->
-  <div class="main-wrapper">
-    <img src="https://github.com/Himanshu-Mittal001/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" class="logo">
-    <h2>📦 Track Your Order</h2>
-
-    <!-- Search Section -->
-    <div class="search-bar">
-      <label for="searchField">🔍 Search by:</label>
-      <select id="searchField" onchange="handleSearchFieldChange()">
-        <option value="Customer Name">👤 Name</option>
-        <option value="Location (Pincode)">📍 Pincode</option>
-        <option value="Tracking ID">🔢 Tracking Code</option>
-        <option value="Date">📅 Date</option>
-      </select>
-      <input type="text" id="searchInput">
-      <input type="date" id="dateInput" style="display:none">
-      <select id="courierDropdown" style="display:none"></select>
-      <button class="search-btn" onclick="filterResults()">Search</button>
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalData"></div>
     </div>
-
-    <!-- Loading -->
-    <div class="loading">⏳ Loading...</div>
-
-    <!-- Results Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Pincode</th>
-          <th>Courier</th>
-          <th>Tracking ID</th>
-        </tr>
-      </thead>
-      <tbody id="resultsTable"></tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="pagination">
-      <button onclick="prevPage()">⬅️</button>
-      <span>Page <input type="number" id="pageNumber" min="1" onchange="jumpToPage()"> of <span id="totalPages"></span></span>
-      <button onclick="nextPage()">➡️</button>
-    </div>
-
-    <!-- Popup -->
-    <div class="popup-overlay" id="popupOverlay">
-      <div class="popup">
-        <button class="close-btn" onclick="hidePopup()">Close</button>
-        <div id="popupContent"></div>
-      </div>
-    </div>
-
-    <p id="copyright">© Cute Printed Nightwears by Radhika ❤️</p>
   </div>
 
   <script src="script.js"></script>
