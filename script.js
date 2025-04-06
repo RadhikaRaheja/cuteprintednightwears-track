@@ -1,78 +1,93 @@
-const sheetId = "1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw";
-const sheetName = "Daily Sales record";
-const courierMappingSheet = "CourierMapping";
-const query = encodeURIComponent("SELECT A, B, C, D, E");
-const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${sheetName}&tq=${query}`;
+const publicSpreadsheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRLNwC1zVRxQRYm20Aaz4iynXUezIe5vaWWGJhtnathB6rerHyCifpFWOlEXIw2QNejEmg6yfPcfhCM/pubhtml';
+let originalData = [];
+let currentPage = 1;
+const rowsPerPage = 10;
 
-const courierLinkMap = {};
+window.addEventListener('DOMContentLoaded', init);
 
-function loadCourierLinks() {
-  const courierQuery = encodeURIComponent("SELECT A, B");
-  const courierURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${courierMappingSheet}&tq=${courierQuery}`;
+function init() {
+  Tabletop.init({
+    key: publicSpreadsheetURL,
+    simpleSheet: true,
+    callback: function(data) {
+      originalData = data;
+      displayTable(data);
+    }
+  });
 
-  return fetch(courierURL)
-    .then(res => res.text())
-    .then(data => {
-      const json = JSON.parse(data.substr(47).slice(0, -2));
-      json.table.rows.forEach(row => {
-        const name = row.c[0]?.v?.trim();
-        const link = row.c[1]?.v?.trim();
-        if (name && link) {
-          courierLinkMap[name.toLowerCase()] = link;
-        }
-      });
-    });
-}
-
-function fetchData() {
-  fetch(base)
-    .then(res => res.text())
-    .then(rep => {
-      const data = JSON.parse(rep.substr(47).slice(0, -2));
-      const rows = data.table.rows;
-      const now = new Date();
-      const past3Months = new Date();
-      past3Months.setMonth(now.getMonth() - 3);
-
-      const table = document.getElementById("tableBody");
-      table.innerHTML = "";
-
-      rows.forEach(row => {
-        const [dateCell, nameCell, locationCell, courierCell, trackingIDCell] = row.c;
-
-        const rowDate = new Date(dateCell?.f || dateCell?.v);
-        if (rowDate < past3Months) return;
-
-        const courierName = courierCell?.v || "";
-        const courierLink = courierLinkMap[courierName.toLowerCase()] || "#";
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${dateCell?.f || ""}</td>
-          <td>${nameCell?.v || ""}</td>
-          <td>${locationCell?.v || ""}</td>
-          <td><a href="${courierLink}" target="_blank">${courierName}</a></td>
-          <td>${trackingIDCell?.v || ""}</td>
-          <td><a href="${courierLink}" target="_blank">Track</a></td>
-        `;
-        table.appendChild(tr);
-      });
-    });
-}
-
-function setupSearch() {
-  const input = document.getElementById("searchInput");
-  input.addEventListener("keyup", function () {
-    const filter = input.value.toLowerCase();
-    const rows = document.querySelectorAll("#tableBody tr");
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(filter) ? "" : "none";
-    });
+  document.getElementById('searchInput').addEventListener('input', filterData);
+  document.getElementById('searchBy').addEventListener('change', filterData);
+  document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+  document.getElementById('prevBtn').addEventListener('click', () => changePage(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => changePage(1));
+  document.querySelector('.close').addEventListener('click', () => {
+    document.getElementById('modal').classList.add('hidden');
   });
 }
 
-loadCourierLinks().then(() => {
-  fetchData();
-  setupSearch();
-});
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+}
+
+function displayTable(data) {
+  const tableBody = document.querySelector('#trackingTable tbody');
+  tableBody.innerHTML = '';
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const pageData = data.slice(start, end);
+
+  pageData.forEach((row, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.Date}</td>
+      <td>${row['Customer Name']}</td>
+      <td>${row.Location}</td>
+      <td>${row.Courier}</td>
+      <td>${row['Tracking ID']}</td>
+      <td><a href="${row['Tracking Link']}" target="_blank">Track</a></td>
+    `;
+    tr.addEventListener('click', () => showModal(row));
+    tableBody.appendChild(tr);
+  });
+
+  document.getElementById('pageInfo').textContent = `Page ${currentPage}`;
+}
+
+function filterData() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const searchBy = document.getElementById('searchBy').value;
+
+  const filtered = originalData.filter(row =>
+    row[searchBy] && row[searchBy].toLowerCase().includes(query)
+  );
+
+  currentPage = 1;
+  displayTable(filtered);
+}
+
+function changePage(direction) {
+  const totalPages = Math.ceil(originalData.length / rowsPerPage);
+  currentPage += direction;
+
+  if (currentPage < 1) currentPage = 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  displayTable(originalData);
+}
+
+function showModal(row) {
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modalBody');
+
+  modalBody.innerHTML = `
+    <h3>Tracking Details</h3>
+    <p><strong>Date:</strong> ${row.Date}</p>
+    <p><strong>Customer:</strong> ${row['Customer Name']}</p>
+    <p><strong>Location:</strong> ${row.Location}</p>
+    <p><strong>Courier:</strong> ${row.Courier}</p>
+    <p><strong>Tracking ID:</strong> ${row['Tracking ID']}</p>
+    <p><a href="${row['Tracking Link']}" target="_blank">Go to Tracking</a></p>
+  `;
+  modal.classList.remove('hidden');
+}
