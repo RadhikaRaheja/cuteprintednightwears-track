@@ -3,43 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tracking Portal - Cute Printed Nightwear</title>
+  <title>CPN Tracking Portal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="theme-toggle">
-    <span>🌞 / 🌙</span>
-    <button id="toggleTheme"></button>
-  </div>
-  
-  <div class="logo">
-    <img src="https://github.com/RadhikaRaheja/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="Logo" />
-  </div>
-
   <div class="container">
-    <input type="text" id="searchInput" placeholder="Search by name, date, location, tracking ID..." />
-    <table id="dataTable">
+    <img src="https://github.com/RadhikaRaheja/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="CPN Logo" class="logo" />
+    <h1>Tracking Details</h1>
+    <input type="text" id="searchInput" placeholder="Search by name, tracking ID, location or courier..." />
+    <table id="trackingTable">
       <thead>
         <tr>
           <th>Date</th>
           <th>Customer Name</th>
           <th>Location</th>
-          <th>Courier Name</th>
+          <th>Courier</th>
           <th>Tracking ID</th>
+          <th>Tracking Link</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="tableBody">
+        <!-- Data will load here -->
+      </tbody>
     </table>
   </div>
-
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div id="modalBody"></div>
-    </div>
-  </div>
-
-  <script src="https://apis.google.com/js/api.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
