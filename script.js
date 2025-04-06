@@ -1,78 +1,68 @@
-const sheetURL = 'https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Daily%20Sales%20record';
-const courierMapURL = 'https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/CourierMapping';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKKzDCXAx_Yg7AzpqRcb8ulYErjzrPAmpzyEVLVWLPjQIv_EicraRL0vHf3VPmJ3EOIgDRgtDkewNR/pub?output=csv';
 
-let allData = [], courierMap = {};
+document.addEventListener('DOMContentLoaded', async () => {
+  const response = await fetch(SHEET_URL);
+  const csvText = await response.text();
+  const data = parseCSV(csvText);
 
-async function fetchData() {
-  const [records, couriers] = await Promise.all([
-    fetch(sheetURL).then(res => res.json()),
-    fetch(courierMapURL).then(res => res.json())
-  ]);
-
-  records.forEach(row => {
-    if (row['Date']) {
-      const entryDate = new Date(row['Date']);
-      const today = new Date();
-      const threeMonthsAgo = new Date(today.setMonth(today.getMonth() - 3));
-      if (entryDate >= threeMonthsAgo) {
-        allData.push(row);
-      }
-    }
+  const filteredData = data.filter(entry => {
+    const entryDate = new Date(entry['Date']);
+    const today = new Date();
+    const threeMonthsAgo = new Date(today.setMonth(today.getMonth() - 3));
+    return entryDate >= threeMonthsAgo;
   });
 
-  couriers.forEach(c => {
-    courierMap[c['Courier Name']] = c['Link'];
-  });
+  renderTable(filteredData);
 
-  renderTable(allData);
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const searchTerm = e.target.value.toLowerCase();
+    const results = filteredData.filter(row =>
+      Object.values(row).some(val =>
+        val.toLowerCase().includes(searchTerm)
+      )
+    );
+    renderTable(results);
+  });
+});
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const values = line.split(',');
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header.trim()] = values[index]?.trim() ?? '';
+    });
+    return row;
+  });
 }
 
 function renderTable(data) {
-  const wrapper = document.getElementById('tableWrapper');
-  let html = `<table><thead><tr>`;
-  const keys = ['Date', 'Customer Name', 'Location-Pincode', 'Courier Name', 'Tracking ID'];
-  keys.forEach(k => html += `<th>${k}</th>`);
-  html += `</tr></thead><tbody>`;
+  const container = document.getElementById('tableContainer');
+  if (data.length === 0) {
+    container.innerHTML = '<p>No records found.</p>';
+    return;
+  }
+
+  const headers = Object.keys(data[0]);
+  let html = '<table><thead><tr>';
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += '</tr></thead><tbody>';
 
   data.forEach(row => {
-    html += `<tr onclick='showModal(${JSON.stringify(row).replace(/'/g, "\\'")})'>`;
-    keys.forEach(k => {
-      if (k === 'Courier Name' && courierMap[row[k]]) {
-        html += `<td><a href="${courierMap[row[k]]}" target="_blank">${row[k]}</a></td>`;
-      } else {
-        html += `<td>${row[k] || ''}</td>`;
+    html += '<tr>';
+    headers.forEach(key => {
+      let cell = row[key];
+      if (key.toLowerCase().includes('courier')) {
+        // Optional: hyperlink logic from 'CourierMapping'
+        cell = `<a href=\"https://www.google.com/search?q=${cell}+courier+tracking\" target=\"_blank\">${cell}</a>`;
       }
+      html += `<td>${cell}</td>`;
     });
-    html += `</tr>`;
+    html += '</tr>';
   });
 
-  html += `</tbody></table>`;
-  wrapper.innerHTML = html;
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
-
-function showModal(row) {
-  const modal = document.getElementById('modal');
-  const modalData = document.getElementById('modalData');
-  modalData.innerHTML = Object.entries(row)
-    .map(([key, value]) => `<p><strong>${key}</strong>: ${value}</p>`)
-    .join('');
-  modal.classList.remove('hidden');
-}
-
-document.querySelector('.close').addEventListener('click', () => {
-  document.getElementById('modal').classList.add('hidden');
-});
-
-document.getElementById('searchBox').addEventListener('input', function () {
-  const query = this.value.toLowerCase();
-  const filtered = allData.filter(row =>
-    Object.values(row).some(v => v && v.toLowerCase().includes(query))
-  );
-  renderTable(filtered);
-});
-
-document.getElementById('toggleTheme').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-fetchData();
