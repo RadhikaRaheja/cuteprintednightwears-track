@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Order Tracking</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking Dashboard - CPN</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="theme-toggle">
-    <button id="toggleTheme">🌞 / 🌙</button>
-  </div>
-  <div class="container">
-    <h1>📦 Order Tracking Dashboard</h1>
-    <input type="text" id="searchBox" placeholder="Search by any field..." />
-    <div id="tableWrapper"></div>
+  <div class="top-bar">
+    <img src="https://github.com/RadhikaRaheja/Gurukul-Images/blob/main/CPN%20logo.jpg?raw=true" alt="Brand Logo" class="brand-logo">
+    <h1>Order Tracking Dashboard</h1>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div id="modalData"></div>
-    </div>
+  <div class="search-section">
+    <input type="text" id="searchInput" placeholder="Search by name, pincode, courier or tracking ID">
+  </div>
+
+  <div class="table-section" id="tableContainer">
+    <!-- Data table gets injected here -->
   </div>
 
   <script src="script.js"></script>
